@@ -149,7 +149,7 @@ const Transactions = () => {
     <div className='p-5 '>
       <h3 className='text-center text-2xl mb-4'><strong>Transaction History</strong></h3>
 
-      <div className="flex justify-between mb-4 md:">
+      <div className="flex justify-around md:grid-cols-2 mb-4 ">
         <div>
           <label className="mr-2">Start Date:</label>
           <input type="date" onChange={(e) => setStartDate(new Date(e.target.value))} value={startDate ? format(startDate, 'yyyy-MM-dd') : ''} />
@@ -158,7 +158,7 @@ const Transactions = () => {
           <label className="mr-2">End Date:</label>
           <input type="date" onChange={(e) => setEndDate(new Date(e.target.value))} value={endDate ? format(endDate, 'yyyy-MM-dd') : ''} />
         </div>
-        <div>
+        <div className=''>
           <button className='bg-red-500 text-white p-1 px-4 rounded' onClick={handleClear}>Clear</button>
         </div>
       </div>
