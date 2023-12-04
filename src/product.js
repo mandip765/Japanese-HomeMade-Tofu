@@ -17,12 +17,12 @@ export const product = [
     price: 1800
   },
   {
-    pic: <img src={'images/silken-tofu-korean-soy-sauce-3.jpg'} alt="" />,
+    pic: <img src={'images/silken-tofu.jpg'} alt="" />,
     name: 'Silken Tofu',
     price: 1200
   },
   {
-    pic: <img src={'images/Tofu-v-2-resized.jpg'} alt="" />,
+    pic: <img src={'images/firm-Tofu.jpg'} alt="" />,
     name: 'Firm Tofu',
     price: 1000
   },
