@@ -73,8 +73,8 @@ const Homepage = () => {
           <h1 className='text-xl'><strong>Difference</strong></h1>
           {
             totalAllTransactions > totalAllExpenses
-              ? <strong className='text-green-700'>{totalAllTransactions - totalAllExpenses}</strong>
-              : <strong className='text-red-700'>{totalAllExpenses - totalAllTransactions}</strong>
+              ? <strong className='text-green-700'>Profit:{totalAllTransactions - totalAllExpenses}</strong>
+              : <strong className='text-red-700'>Loss:{totalAllExpenses - totalAllTransactions}</strong>
           }
         </div>
 

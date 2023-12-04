@@ -150,7 +150,7 @@ const SalesTransaction = () => {
         ))}
         <div>
           <form className="p-5 bg-blue-100 rounded-md">
-            <h2 className="text-xl mb-4 font-bold">Custom Product Inion</h2>
+            <h2 className="text-xl mb-4 font-bold">Custom Product</h2>
             <div className="mb-4">
               <label className="block mb-1">Product Name:</label>
               <input
