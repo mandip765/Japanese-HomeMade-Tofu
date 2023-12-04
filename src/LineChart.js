@@ -11,7 +11,7 @@ const LineChart = () => {
 
   useEffect(() => {
     // Fetch transactions data
-    axios.get('http://localhost:5005/api/transactions')
+    axios.get('https://jhmt.onrender.com/api/transactions')
       .then(response => {
         setTransactions(response.data);
       })
@@ -20,7 +20,7 @@ const LineChart = () => {
       });
 
     // Fetch expenses data
-    axios.get('http://localhost:5005/api/expenses')
+    axios.get('https://jhmt.onrender.com/api/expenses')
       .then(response => {
         setExpenses(response.data);
       })

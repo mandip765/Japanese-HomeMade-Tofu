@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-const backendURL = 'http://localhost:5005';
+const backendURL = 'https://jhmt.onrender.com';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);

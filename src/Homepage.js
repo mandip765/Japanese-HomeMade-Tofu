@@ -7,7 +7,7 @@ import TransactionChart from './LineChart';
 Chart.register(CategoryScale);
 
 const Homepage = () => {
-  const backendURL = 'http://localhost:5005';
+  const backendURL = 'https://jhmt.onrender.com';
   const [totalAllExpenses, setTotalAllExpenses] = useState(0);
   const [totalAllTransactions, setTotalAllTransactions] = useState(0);
 
