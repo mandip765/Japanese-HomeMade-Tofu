@@ -2,6 +2,11 @@
 
 export const product = [
   {
+    pic: <img src={'images/apple-tart-cake.jpg'} alt="" />,
+    name: 'Apple Tart Cake',
+    price: 1800
+  },
+  {
     pic: <img src={"images/blueberry-cheesecake1.jpg"} alt="" />,
     name: 'Blueberry Cheesecake',
     price: 1800
@@ -12,9 +17,19 @@ export const product = [
     price: 1500
   },
   {
+    pic: <img src={'images/rare_cheesecake.jpg'} alt="" />,
+    name: 'Rare Cheesecake',
+    price: 1600
+  },
+  {
     pic: <img src={'images/tiramisu.jpg'} alt="" />,
     name: 'Tiramisu',
     price: 1800
+  },
+  {
+    pic: <img src={'images/brownie.jpg'} alt="" />,
+    name: 'Brownie',
+    price: 1000
   },
   {
     pic: <img src={'images/silken-tofu.jpg'} alt="" />,
@@ -25,11 +40,6 @@ export const product = [
     pic: <img src={'images/firm-Tofu.jpg'} alt="" />,
     name: 'Firm Tofu',
     price: 1000
-  },
-  {
-    pic: <img src={'images/rare_cheesecake.jpg'} alt="" />,
-    name: 'Rare Cheesecake',
-    price: 1600
   }
 ];
 

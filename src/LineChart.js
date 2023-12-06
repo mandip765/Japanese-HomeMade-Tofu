@@ -1,8 +1,14 @@
-// src/components/LineChart.js
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Line } from 'react-chartjs-2';
+import Chart, {
+  Series,
+  ArgumentAxis,
+  ZoomAndPan,
+  Legend,
+  ScrollBar,
+  Point,
+  Label,
+} from 'devextreme-react/chart';
 import { format } from 'date-fns';
 
 const LineChart = () => {
@@ -58,28 +64,54 @@ const LineChart = () => {
   });
 
   // Convert aggregated data to an array for the chart
-  const chartData = {
-    labels: Object.keys(combinedAggregatedData),
-    datasets: [
-      {
-        label: 'Sales',
-        data: Object.values(combinedAggregatedData).map(item => item.sales),
-        fill: false,
-        borderColor: '#07DC01',
-      },
-      {
-        label: 'Expenses',
-        data: Object.values(combinedAggregatedData).map(item => item.expenses),
-        fill: false,
-        borderColor: 'red',
-      },
-    ],
-  };
+  const chartData = Object.keys(combinedAggregatedData).map(date => ({
+    arg: new Date(date).toDateString(),
+    sales: combinedAggregatedData[date].sales,
+    expenses: combinedAggregatedData[date].expenses,
+  }));
+  chartData.sort((a, b) => a.arg - b.arg);
 
   return (
     <div>
       <h2 className='text-2xl'><strong>Sales and Expenses Chart</strong></h2>
-      <Line data={chartData} />
+      {chartData.length > 0 ? (
+        <Chart
+          dataSource={chartData}
+        >
+          <Series
+            valueField="sales"
+            name="Sales"
+            color="green"
+          >
+            <Point size={7} />
+            <Label
+              visible={true}
+              position="top"
+              backgroundColor="none"
+              font={{ size: 12 }}
+            />
+          </Series>
+          <Series
+            valueField="expenses"
+            name="Expenses"
+            color="red"
+          >
+            <Point size={8} />
+            <Label
+              visible={true}
+              position="bottom"
+              backgroundColor="none"
+              font={{ size: 12 }}
+            />
+          </Series>
+          <ArgumentAxis />
+          <ScrollBar visible={true} />
+          <ZoomAndPan argumentAxis="both" />
+          <Legend visible={false} />
+        </Chart>
+      ) : (
+        <p>No data available for the chart.</p>
+      )}
     </div>
   );
 };

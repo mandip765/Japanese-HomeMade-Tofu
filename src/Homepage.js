@@ -1,8 +1,9 @@
 // HomePage.js
 import React, { useState, useEffect } from 'react';
-import Chart from "chart.js/auto";
+import { Chart } from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 import TransactionChart from './LineChart';
+
 
 Chart.register(CategoryScale);
 
@@ -10,6 +11,8 @@ const Homepage = () => {
   const backendURL = 'https://jhmt.onrender.com';
   const [totalAllExpenses, setTotalAllExpenses] = useState(0);
   const [totalAllTransactions, setTotalAllTransactions] = useState(0);
+
+
 
   const fetchTotalTransactions = async () => {
     try {
@@ -45,9 +48,11 @@ const Homepage = () => {
 
 
 
+
   useEffect(() => {
     fetchTotalTransactions();
     fetchTotalExpenses();
+
   });
 
   return (

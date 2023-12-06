@@ -148,46 +148,46 @@ const SalesTransaction = () => {
           </div>
 
         ))}
-      </div>
-      <div>
-        <form className="p-5 mx-5 bg-blue-100 rounded-md">
-          <h2 className="text-xl mb-4 font-bold">Custom Product</h2>
-          <div className="mb-4">
-            <label className="block mb-1">Product Name:</label>
-            <input
-              className="w-full rounded-md p-2 border"
-              type="text"
-              value={customProductName}
-              onChange={(e) => setCustomProductName(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-1">Product Price:</label>
-            <input
-              className="w-full rounded-md p-2 border"
-              type="number"
-              min="0"
-              step="0.01"
-              value={customProductPrice}
-              onChange={(e) => setCustomProductPrice(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Quantity:</label>
-            <input
-              className="w-full rounded-md p-2 border"
-              type="number"
-              min="0"
-              value={quantitySold[customProductName] || ''}
-              onChange={(e) => {
-                setQuantitySold((prevQuantitySold) => ({
-                  ...prevQuantitySold,
-                  [customProductName]: parseInt(e.target.value, 10),
-                }));
-              }}
-            />
-          </div>
-        </form>
+        <div className='md:col-span-2' >
+          <form className="p-5 bg-blue-100 rounded-md">
+            <h2 className="text-xl mb-4 font-bold">Custom Product</h2>
+            <div className="mb-4">
+              <label className="block mb-1">Product Name:</label>
+              <input
+                className="w-full rounded-md p-2 border"
+                type="text"
+                value={customProductName}
+                onChange={(e) => setCustomProductName(e.target.value)}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1">Product Price:</label>
+              <input
+                className="w-full rounded-md p-2 border"
+                type="number"
+                min="0"
+                step="0.01"
+                value={customProductPrice}
+                onChange={(e) => setCustomProductPrice(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Quantity:</label>
+              <input
+                className="w-full rounded-md p-2 border"
+                type="number"
+                min="0"
+                value={quantitySold[customProductName] || ''}
+                onChange={(e) => {
+                  setQuantitySold((prevQuantitySold) => ({
+                    ...prevQuantitySold,
+                    [customProductName]: parseInt(e.target.value, 10),
+                  }));
+                }}
+              />
+            </div>
+          </form>
+        </div>
       </div>
 
       <div className="px-5 flex justify-center items-center mt-4">
@@ -195,7 +195,7 @@ const SalesTransaction = () => {
           className="bg-teal-300 mb-5 rounded-md p-2"
           onClick={handleCompleteTransaction}
         >
-          Complete Transactions
+          Add Income
         </button>
       </div>
     </div>

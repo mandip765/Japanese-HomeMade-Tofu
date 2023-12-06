@@ -37,7 +37,7 @@ const Header = () => {
 
         <div className="flex items-center space-x-5">
           {/* <div className="space-x-5"> */}
-          {show && <nav className='space-x-5  flex-col hidden sm:flex '>
+          {show && <nav className='space-x-5  flex-col hidden sm:flex'>
             <NavLink to='/Transactions'>Transactions</NavLink>
             <NavLink to='Expenses'>Expenses</NavLink>
             <NavLink to='/SalesTransaction'>Incomes</NavLink>
