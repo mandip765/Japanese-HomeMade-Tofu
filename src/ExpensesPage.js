@@ -11,6 +11,7 @@ const ExpensesPage = () => {
   const [customProductPrice, setCustomProductPrice] = useState('');
   const [quantitySold, setQuantitySold] = useState({});
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const calculateTotalAmount = (item) => {
@@ -25,6 +26,7 @@ const ExpensesPage = () => {
 
   const handleCompleteTransaction = async () => {
     try {
+      setIsLoading(true);
       const successMessages = [];
       const errorMessages = [];
 
@@ -55,10 +57,6 @@ const ExpensesPage = () => {
           errorMessages.push('Failed to add custom product to the transaction.');
         }
       }
-
-      // Assuming selectedProducts is not needed for expenses
-      // await Promise.all(transactionsPromises);
-
       successMessages.forEach((message) => {
         toast.success(message);
       });
@@ -70,37 +68,13 @@ const ExpensesPage = () => {
       console.error('Error:', error);
       toast.error('Error completing transactions.');
     } finally {
-      // Assuming selectedProducts is not needed for expenses
-      // setSelectedProducts([]);
+      setIsLoading(false);
       setQuantitySold({});
       setCustomProductName('');
       setCustomProductPrice('');
     }
   };
 
-  const handleAddProduct = () => {
-    // Implement validation as needed before adding to the selectedProducts array
-    setSelectedProducts([
-      ...selectedProducts,
-      {
-        name: '',
-        value: 0, // Set a default value or leave it as an empty string
-      },
-    ]);
-  };
-
-  const handleProductChange = (index, property, newValue) => {
-    setSelectedProducts((prevProducts) =>
-      prevProducts.map((product, i) => (i === index ? { ...product, [property]: newValue } : product))
-    );
-  };
-
-  const yourArrayOfOptions = [
-    { value: 'CheeseSpread', label: 'Cheese Spread' },
-    { value: 'Butter', label: 'Butter' },
-    { value: 'Sugar', label: 'Sugar' },
-    // Add more options as needed
-  ];
 
   return (
     <div>
@@ -152,10 +126,11 @@ const ExpensesPage = () => {
 
       <div className="px-5 flex justify-center items-center mt-4">
         <button
-          className="bg-teal-300 mb-5 rounded-md p-2"
+          className={`bg-teal-300 mb-5 rounded-md p-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleCompleteTransaction}
+          disabled={isLoading}
         >
-          Add Expense
+          {isLoading ? 'Adding Expense...' : 'Add Expense'}
         </button>
       </div>
     </div >

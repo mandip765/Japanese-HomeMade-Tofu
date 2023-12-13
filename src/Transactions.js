@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-
-const backendURL = 'https://jhmt.onrender.com';
+import { baseUrl } from './features/constant';
+// const backendURL = 'https://jhmt.onrender.com';
+const backendURL = baseUrl;
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -145,6 +146,51 @@ const Transactions = () => {
     fetchDetailedExpenses();
   }, [startDate, endDate]);
 
+  const handleDeleteTransaction = async (transactionId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this expense?');
+
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const response = await fetch(`${backendURL}/api/transactions/${transactionId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove the deleted transaction from the state
+        setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== transactionId));
+      } else {
+        console.error('Failed to delete transaction. Response:', response);
+      }
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  const handleDeleteExpense = async (expenseId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this expense?');
+
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const response = await fetch(`${backendURL}/api/expenses/${expenseId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove the deleted expense from the state
+        setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense._id !== expenseId));
+      } else {
+        console.error('Failed to delete expense. Response:', response);
+      }
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
+
+
   return (
     <div className='p-5 '>
       <h3 className='text-center text-2xl mb-4'><strong>Transaction History</strong></h3>
@@ -182,9 +228,13 @@ const Transactions = () => {
                 <td>{format(new Date(expense.timestamp), 'PPP', { timeZone: 'Asia/Kathmandu' })}</td>
                 <td className='text-center'>{expense.quantitySold || '-'}</td>
                 <td className='text-center text-red-400'>{expense.totalAmount}</td>
+                <td>
+                  <button onClick={() => handleDeleteExpense(expense._id)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
+
         </table>
       )}
       <table className='table w-full'>
@@ -202,12 +252,16 @@ const Transactions = () => {
               <td>{transaction.product && transaction.product.name}</td>
               <td>{format(new Date(transaction.timestamp), 'PPP', { timeZone: 'Asia/Kathmandu' })}</td>
               <td className='text-center'>{transaction.quantitySold}</td>
-              <td className='text-center text-green-500 '>{transaction.totalAmount}</td>
+              <td className='text-center text-green-500'>{transaction.totalAmount}</td>
+              <td>
+                <button onClick={() => handleDeleteTransaction(transaction._id)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
+
       </table>
-      {startDate && endDate ? (
+      {(startDate && endDate) || (startDate || endDate) ? (
         <div>
           <p className="text-xl mb-2"><strong>Total of Selected Expenses:</strong> {totalSelectedExpenses}</p>
           <p className="text-xl mb-2"><strong>Total of Selected Incomes:</strong> {totalSelectedTransactions}</p>
@@ -222,12 +276,12 @@ const Transactions = () => {
             <td colSpan="3"><strong>Total of All Expenses:</strong></td>
             <td className='text-red-400'><strong>{totalAllExpenses}</strong></td>
           </tr>
+          <div>
+            <p className="text-xl mb-2"><strong>Total of All Transactions:</strong> {totalAllTransactions - totalAllExpenses}</p>
+          </div>
         </tfoot>
 
       )}
-      <div>
-        <p className="text-xl mb-2"><strong>Total of All Transactions:</strong> {totalAllTransactions - totalAllExpenses}</p>
-      </div>
     </div>
   );
 };

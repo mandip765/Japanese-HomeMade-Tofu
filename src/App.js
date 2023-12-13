@@ -7,6 +7,7 @@ import SalesTransaction from './SalesTransaction';
 import Transactions from './Transactions';
 import ExpensesPage from './ExpensesPage';
 import Homepage from './Homepage';
+import Products from './Products';
 
 
 
@@ -19,6 +20,7 @@ const App = () => {
           <Route path='/Transactions' element={<Transactions />} />
           <Route path='/Expenses' element={<ExpensesPage />} />
           <Route path='/SalesTransaction' element={<SalesTransaction />} />
+          <Route path='/Products' element={<Products />} />
         </Route>
 
 

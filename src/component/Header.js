@@ -41,6 +41,7 @@ const Header = () => {
             <NavLink to='/Transactions'>Transactions</NavLink>
             <NavLink to='Expenses'>Expenses</NavLink>
             <NavLink to='/SalesTransaction'>Incomes</NavLink>
+            <NavLink to='/products'>Products</NavLink>
           </nav>}
         </div>
         <div className='hidden sm:flex'>
@@ -55,6 +56,7 @@ const Header = () => {
           <NavLink to='/Transactions'>Transactions</NavLink>
           <NavLink to='/expenses'>Expenses</NavLink>
           <NavLink to='/SalesTransaction'>Incomes</NavLink>
+          <NavLink to='/products'>Products</NavLink>
 
         </nav>
 
