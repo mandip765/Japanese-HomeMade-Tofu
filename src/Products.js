@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import AddProduct from './AddProduct';
 import { baseUrl } from './features/constant';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 const Products = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -93,42 +95,67 @@ const Products = () => {
                   alt={item.name}
                   style={{ maxWidth: '100%', height: 'auto', borderRadius: '4px' }}
                 />
-
-                <h2 className="text-xl font-bold">{item.name}</h2>
-                <p>Price: {item.price}</p>
-
-                <button onClick={() => handleEditClick(item)}>Edit</button>
-
-                {editingProduct && editingProduct._id === item._id && (
-                  <div>
-                    <h2>Edit Product</h2>
+                {editingProduct && editingProduct._id === item._id ? (
+                  <div className="mt-4 p-4  rounded">
+                    <h2 className="text-xl font-bold mb-2">Edit Product</h2>
                     <form onSubmit={handleEditSubmit}>
-                      <label htmlFor="editName">Name:</label>
-                      <input
-                        type="text"
-                        id="editName"
-                        value={editedProductName}
-                        onChange={(e) => setEditedProductName(e.target.value)}
-                      />
+                      <div className="mb-4">
+                        <label htmlFor="editName" className="block text-sm font-medium ">
+                          Name:
+                        </label>
+                        <input
+                          type="text"
+                          id="editName"
+                          value={editedProductName}
+                          onChange={(e) => setEditedProductName(e.target.value)}
+                          className="mt-1 p-2 border rounded-md w-full"
+                        />
+                      </div>
 
-                      <label htmlFor="editPrice">Price:</label>
-                      <input
-                        type="number"
-                        id="editPrice"
-                        value={editedProductPrice}
-                        onChange={(e) => setEditedProductPrice(e.target.value)}
-                      />
-
-                      <button type="submit">Save</button>
-                      <button type="button" onClick={() => setEditingProduct(null)}>
-                        Cancel
-                      </button>
+                      <div className="mb-4">
+                        <label htmlFor="editPrice" className="block text-sm font-medium ">
+                          Price:
+                        </label>
+                        <input
+                          type="number"
+                          id="editPrice"
+                          value={editedProductPrice}
+                          onChange={(e) => setEditedProductPrice(e.target.value)}
+                          className="mt-1 p-2 border rounded-md w-full"
+                        />
+                      </div>
+                      <div className="flex justify-between">
+                        <button
+                          type="submit"
+                          className="bg-green-500 text-white px-4 py-2 rounded-md focus:outline-none"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct(null)}
+                          className="bg-red-500 text-white px-4 py-2 rounded-md focus:outline-none"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </form>
+                  </div>
+                ) : (
+                  <div className="flex flex-col mt-2">
+                    <h2 className="text-xl font-bold">{item.name}</h2>
+                    <p>Price: {item.price}</p>
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mt-2"
+                    >
+                      <FontAwesomeIcon icon={faPen} className="mr-2" />
+                      Edit
+                    </button>
                   </div>
                 )}
               </div>
             ))}
-
             <div
               className="bg-blue-100 p-4 border rounded-md"
               style={{ borderRadius: '8px' }}
