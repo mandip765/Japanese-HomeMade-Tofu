@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   return (
-    <Navbar className="p-2 px-3 bg-blue-400 w-full"> {/* Add w-full class */}
+    <Navbar className="p-2 px-3 bg-blue-400 w-[100%]"> {/* Add w-full class */}
       <div className="flex justify-between">
         <Typography className="mr-4 ml-2 cursor-pointer py-1.5 font-medium">
           <NavLink to="/" replace>

@@ -83,7 +83,9 @@ const Products = () => {
           <div className='m-5 mb-0 text-3xl flex justify-between'>
             <h1><strong>All Products</strong></h1>
           </div>
-          <div className="grid grid-cols-4 md:grid-cols-2 p-5 gap-2">
+          <div className="grid grid-cols-4 md:grid-cols-2
+          xsm:grid-cols-1
+           p-5 gap-2">
             {products.map((item) => (
               <div
                 className="bg-blue-100 p-4 border rounded-md"
