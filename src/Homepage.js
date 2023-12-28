@@ -57,7 +57,7 @@ const Homepage = () => {
 
   return (
     <div className='p-5 grid grid-cols-2 md:grid-cols-1 gap-5 bg-blue-50'>
-      <div className='bg-blue-gray-100 rounded'>
+      <div className='bg-blue-gray-100 '>
         <TransactionChart />
       </div>
       <div>
