@@ -16,6 +16,10 @@ const Header = () => {
     }
   };
 
+  const hideSidebar = () => {
+    setShow(false);
+  };
+
   useEffect(() => {
     document.addEventListener("click", handleClick);
 
@@ -71,16 +75,16 @@ const Header = () => {
           style={{ zIndex: 3 }}
         >
           <nav className="flex flex-col space-y-1">
-            <NavLink to="/Transactions" className="text-white border-b border-blue-gray-400 p-2" aria-label="Transactions">
+            <NavLink to="/Transactions" className="text-white border-b border-blue-gray-400 p-2" aria-label="Transactions" onClick={hideSidebar}>
               Transactions
             </NavLink>
-            <NavLink to="/Expenses" className="text-white border-b border-blue-gray-400 p-2" aria-label="Expenses">
+            <NavLink to="/Expenses" className="text-white border-b border-blue-gray-400 p-2" aria-label="Expenses" onClick={hideSidebar}>
               Expenses
             </NavLink>
-            <NavLink to="/SalesTransaction" className="text-white border-b border-blue-gray-400 p-2" aria-label="Incomes">
+            <NavLink to="/SalesTransaction" className="text-white border-b border-blue-gray-400 p-2" aria-label="Incomes" onClick={hideSidebar}>
               Incomes
             </NavLink>
-            <NavLink to="/products" className="text-white border-b border-blue-gray-400 p-2" aria-label="Products">
+            <NavLink to="/products" className="text-white border-b border-blue-gray-400 p-2" aria-label="Products" onClick={hideSidebar}>
               Products
             </NavLink>
           </nav>

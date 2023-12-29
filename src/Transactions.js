@@ -327,12 +327,18 @@
 // export default Transactions;
 
 
+
+
+
+
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, addDays, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { baseUrl } from './features/constant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import ConfirmationModal from './DeleteConfirmationModal';
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS
+import Select from 'react-select';
 
 const backendURL = baseUrl;
 
@@ -346,6 +352,8 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationItemId, setConfirmationItemId] = useState(null);
 
   const fetchTotalTransactions = async () => {
     try {
@@ -466,6 +474,61 @@ const Transactions = () => {
     fetchTotalExpenses();
   };
 
+  const handleDeleteTransaction = async (transactionId) => {
+    setConfirmationItemId(transactionId);
+    setShowConfirmationModal(true);
+  };
+
+  const handleDeleteExpense = async (expenseId) => {
+    setConfirmationItemId(expenseId);
+    setShowConfirmationModal(true);
+  };
+
+  const hideConfirmationModal = () => {
+    setShowConfirmationModal(false);
+    setConfirmationItemId(null);
+  };
+
+  const handleDeleteConfirmation = async () => {
+    if (!confirmationItemId) {
+      hideConfirmationModal();
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendURL}/api/transactions/${confirmationItemId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== confirmationItemId));
+      } else {
+        console.error('Failed to delete transaction. Response:', response);
+      }
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    } finally {
+      hideConfirmationModal();
+    }
+  };
+  const today = new Date();
+  const last7Days = addDays(today, -6);
+  const last30Days = addDays(today, -29);
+  const thisMonthStart = startOfMonth(today);
+  const thisMonthEnd = endOfMonth(today);
+
+  const defaultDateRanges = [
+    { label: 'Today', range: [today, today] },
+    { label: 'Last 7 Days', range: [last7Days, today] },
+    { label: 'Last 30 Days', range: [last30Days, today] },
+    { label: 'This Month', range: [thisMonthStart, thisMonthEnd] },
+  ];
+
+  const handleDefaultDateRange = (selectedOption) => {
+    const range = selectedOption.value;
+    setStartDate(range[0]);
+    setEndDate(range[1]);
+  };
   useEffect(() => {
     fetchTotalTransactions();
     fetchDetailedTransactions();
@@ -473,47 +536,6 @@ const Transactions = () => {
     fetchDetailedExpenses();
   }, [startDate, endDate]);
 
-  const handleDeleteTransaction = async (transactionId) => {
-    const isConfirmed = window.confirm('Are you sure you want to delete this expense?');
-
-    if (!isConfirmed) {
-      return;
-    }
-    try {
-      const response = await fetch(`${backendURL}/api/transactions/${transactionId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== transactionId));
-      } else {
-        console.error('Failed to delete transaction. Response:', response);
-      }
-    } catch (error) {
-      console.error('Error deleting transaction:', error);
-    }
-  };
-
-  const handleDeleteExpense = async (expenseId) => {
-    const isConfirmed = window.confirm('Are you sure you want to delete this expense?');
-
-    if (!isConfirmed) {
-      return;
-    }
-    try {
-      const response = await fetch(`${backendURL}/api/expenses/${expenseId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense._id !== expenseId));
-      } else {
-        console.error('Failed to delete expense. Response:', response);
-      }
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-    }
-  };
 
   return (
     <div className="p-5">
@@ -521,7 +543,7 @@ const Transactions = () => {
         <strong>Transaction History</strong>
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 mb-4">
+      <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-1 mb-4">
         <div className="mb-2">
           <label className="mr-2">Start Date:</label>
           <input
@@ -546,6 +568,23 @@ const Transactions = () => {
           </button>
         </div>
       </div>
+      <div className="mb-4">
+        <Select
+          options={defaultDateRanges.map((rangeOption) => ({
+            value: rangeOption.range,
+            label: rangeOption.label,
+          }))}
+          onChange={handleDefaultDateRange}
+          placeholder="Select Date Range"
+        />
+      </div>
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        onClose={hideConfirmationModal}
+        onConfirm={handleDeleteConfirmation}
+        message="Are you sure you want to delete this item?"
+      />
 
       {loading ? (
         <div>
@@ -562,7 +601,7 @@ const Transactions = () => {
       ) : (
         <>
           <table className="table w-full mb-4">
-            <thead className='bg-black text-white' >
+            <thead className='bg-black text-white'>
               <tr>
                 <th>Detail</th>
                 <th>Date</th>
@@ -580,7 +619,6 @@ const Transactions = () => {
                   <td className="text-center">{expense.quantitySold || '-'}</td>
                   <td className="text-center text-red-400">{expense.totalAmount}</td>
                   <td className="text-center">
-
                     <button
                       onClick={() => handleDeleteExpense(expense._id)}
                       className="flex items-center justify-center h-full"
@@ -593,10 +631,8 @@ const Transactions = () => {
             </tbody>
           </table>
 
-
-
           <table className="table w-full">
-            <thead className='bg-black text-white' >
+            <thead className='bg-black text-white'>
               <tr>
                 <th>Detail</th>
                 <th>Date</th>
@@ -626,36 +662,34 @@ const Transactions = () => {
             </tbody>
           </table>
 
-        </>
-      )}
-
-
-      {
-        (startDate && endDate) || (startDate || endDate) ? (
-          <div className="mt-4">
-            <p className="text-xl mb-2">
-              <strong>Total of Selected Expenses:</strong> {totalSelectedExpenses}
-            </p>
-            <p className="text-xl mb-2">
-              <strong>Total of Selected Incomes:</strong> {totalSelectedTransactions}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4">
-            <p className="text-xl mb-2">
-              <strong>Total of All Incomes:</strong> {totalAllTransactions}
-            </p>
-            <p className="text-xl mb-2">
-              <strong>Total of All Expenses:</strong> {totalAllExpenses}
-            </p>
-            <div>
+          {/* Total amounts display */}
+          {(startDate && endDate) || (startDate || endDate) ? (
+            <div className="mt-4">
               <p className="text-xl mb-2">
-                <strong>Total of All Transactions:</strong> {totalAllTransactions - totalAllExpenses}
+                <strong>Total of Selected Expenses:</strong> {totalSelectedExpenses}
+              </p>
+              <p className="text-xl mb-2">
+                <strong>Total of Selected Incomes:</strong> {totalSelectedTransactions}
               </p>
             </div>
-          </div>
-        )}
-    </div >
+          ) : (
+            <div className="mt-4">
+              <p className="text-xl mb-2">
+                <strong>Total of All Incomes:</strong> {totalAllTransactions}
+              </p>
+              <p className="text-xl mb-2">
+                <strong>Total of All Expenses:</strong> {totalAllExpenses}
+              </p>
+              <div>
+                <p className="text-xl mb-2">
+                  <strong>Total of All Transactions:</strong> {totalAllTransactions - totalAllExpenses}
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 
