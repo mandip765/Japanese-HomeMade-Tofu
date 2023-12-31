@@ -339,6 +339,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModal from './DeleteConfirmationModal';
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS
 import Select from 'react-select';
+import { toast } from 'react-toastify';
 
 const backendURL = baseUrl;
 
@@ -350,6 +351,7 @@ const Transactions = () => {
   const [totalAllExpenses, setTotalAllExpenses] = useState(0);
   const [totalSelectedExpenses, setTotalSelectedExpenses] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isIncomeConfirmation, setIsIncomeConfirmation] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -476,11 +478,13 @@ const Transactions = () => {
 
   const handleDeleteTransaction = async (transactionId) => {
     setConfirmationItemId(transactionId);
+    setIsIncomeConfirmation(true);
     setShowConfirmationModal(true);
   };
 
   const handleDeleteExpense = async (expenseId) => {
     setConfirmationItemId(expenseId);
+    setIsIncomeConfirmation(false);
     setShowConfirmationModal(true);
   };
 
@@ -489,7 +493,7 @@ const Transactions = () => {
     setConfirmationItemId(null);
   };
 
-  const handleDeleteConfirmation = async () => {
+  const handleDeleteIncomeConfirmation = async () => {
     if (!confirmationItemId) {
       hideConfirmationModal();
       return;
@@ -502,7 +506,9 @@ const Transactions = () => {
 
       if (response.ok) {
         setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== confirmationItemId));
+        toast.success('Transaction deleted successfully')
       } else {
+        toast.error('Failed to delete transaction')
         console.error('Failed to delete transaction. Response:', response);
       }
     } catch (error) {
@@ -510,6 +516,32 @@ const Transactions = () => {
     } finally {
       hideConfirmationModal();
     }
+
+  };
+  const handleDeleteExpensesConfirmation = async () => {
+    if (!confirmationItemId) {
+      hideConfirmationModal();
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendURL}/api/expenses/${confirmationItemId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense._id !== confirmationItemId));
+        toast.success('Transaction deleted successfully')
+      } else {
+        toast.error('Failed to delete transaction')
+        console.error('Failed to delete transaction. Response:', response);
+      }
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    } finally {
+      hideConfirmationModal();
+    }
+
   };
   const today = new Date();
   const last7Days = addDays(today, -6);
@@ -582,9 +614,16 @@ const Transactions = () => {
       <ConfirmationModal
         isOpen={showConfirmationModal}
         onClose={hideConfirmationModal}
-        onConfirm={handleDeleteConfirmation}
+        onConfirm={() => {
+          if (isIncomeConfirmation) {
+            handleDeleteIncomeConfirmation();
+          } else {
+            handleDeleteExpensesConfirmation();
+          }
+        }}
         message="Are you sure you want to delete this item?"
       />
+
 
       {loading ? (
         <div>

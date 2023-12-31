@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router';
 import { baseUrl } from './features/constant';
-import Select from 'react-select';
 
 
 const ExpensesPage = () => {
-  const nav = useNavigate();
   const [customProductName, setCustomProductName] = useState('');
   const [customProductPrice, setCustomProductPrice] = useState('');
   const [quantitySold, setQuantitySold] = useState({});
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [UnitOfMeasurement, setUnitOfMeasurement] = useState('unit');
+  const [vat, setVat] = useState(0);
 
 
   const calculateTotalAmount = (item) => {
     const quantity = item.name === customProductName ? quantitySold[customProductName] || 0 : quantitySold[item.name] || 0;
-
-    if (quantity) {
-      return item.price * quantity;
-    }
-
-    return 0;
+    const subtotal = item.price * quantity;
+    const vatAmount = (subtotal * vat) / 100;
+    return subtotal + vatAmount;
   };
+
 
   const handleCompleteTransaction = async () => {
     try {
@@ -48,6 +44,7 @@ const ExpensesPage = () => {
             quantitySold: customProduct.quantity,
             totalAmount: calculateTotalAmount(customProduct),
             timestamp: new Date(),
+
           }),
         });
 
@@ -78,10 +75,10 @@ const ExpensesPage = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-4 sm:grid-cols-1 p-5 gap-2 ">
+      <div className="p-5 gap-2 ">
         <div>
           <form className="p-5 bg-blue-100 rounded-md">
-            <h2 className="text-xl mb-4 font-bold">Expenses</h2>
+            <h2 className="text-xl mb-4 font-bold">Add Expenses</h2>
             <div className="mb-4">
               <label className="block mb-1">Product Name:</label>
 
@@ -96,15 +93,37 @@ const ExpensesPage = () => {
 
             <div className="mb-4">
               <label className="block mb-1">Product Price:</label>
+              <div className='  grid grid-flow-col'>
+                <input
+                  className="w-full rounded-md p-2 border"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={customProductPrice}
+                  onChange={(e) => setCustomProductPrice(e.target.value)}
+                />
+                <select
+                  className="ml-2 p-2 border rounded-md"
+                  onChange={(e) => setUnitOfMeasurement(e.target.value)}
+                >
+                  <option value="unit">per unit</option>
+                  <option value="kg">per kg</option>
+                  <option value="liter">per liter</option>
+                </select>
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1">VAT Rate (%):</label>
               <input
                 className="w-full rounded-md p-2 border"
                 type="number"
                 min="0"
                 step="0.01"
-                value={customProductPrice}
-                onChange={(e) => setCustomProductPrice(e.target.value)}
+                value={vat}
+                onChange={(e) => setVat(parseFloat(e.target.value))}
               />
             </div>
+
             <div>
               <label className="block mb-1">Quantity:</label>
               <input
