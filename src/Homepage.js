@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from "chart.js/auto";
 import { CategoryScale } from "chart.js";
-import TransactionChart from './LineChart';
 import ExpensesPage from './ExpensesPage';
 
 
@@ -58,9 +57,6 @@ const Homepage = () => {
 
   return (
     <div className='p-5 grid grid-cols-2 md:grid-cols-1 gap-5 bg-blue-50'>
-      <div className='bg-blue-100 rounded p-[-2px] '>
-        <TransactionChart />
-      </div>
       <div>
         <div className='grid grid-cols-2 gap-1'>
           <div className='p-2 bg-blue-gray-100 rounded'>

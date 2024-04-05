@@ -343,6 +343,14 @@ import { toast } from 'react-toastify';
 
 const backendURL = baseUrl;
 
+
+// Define filter options
+const FILTER_OPTIONS = {
+  ALL: 'All',
+  TRANSACTIONS: 'Incomes',
+  EXPENSES: 'Expenses',
+};
+
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [totalAllTransactions, setTotalAllTransactions] = useState(0);
@@ -356,6 +364,7 @@ const Transactions = () => {
   const [endDate, setEndDate] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationItemId, setConfirmationItemId] = useState(null);
+  const [currentFilter, setCurrentFilter] = useState(FILTER_OPTIONS.ALL); // Added state for filter selection
 
   const fetchTotalTransactions = async () => {
     try {
@@ -574,6 +583,18 @@ const Transactions = () => {
       <h3 className="text-center text-2xl mb-4">
         <strong>Transaction History</strong>
       </h3>
+      {/* Filter Controls */}
+      <div className="filter-controls mb-4 flex justify-center gap-4">
+        {Object.values(FILTER_OPTIONS).map((filterOption) => (
+          <button
+            key={filterOption}
+            onClick={() => setCurrentFilter(filterOption)}
+            className={`py-2 px-4 rounded ${currentFilter === filterOption ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            {filterOption}
+          </button>
+        ))}
+      </div>
 
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-1 mb-4">
         <div className="mb-2">
@@ -639,67 +660,76 @@ const Transactions = () => {
         </div>
       ) : (
         <>
-          <table className="table w-full mb-4">
-            <thead className='bg-black text-white'>
-              <tr>
-                <th>Detail</th>
-                <th>Date</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map((expense, index) => (
-                <tr key={expense._id} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-                  <td>{expense.product && expense.product.name}</td>
-                  <td className="hidden sm:table-cell text-sm text-center">{format(new Date(expense.timestamp), 'MM/dd', { timeZone: 'Asia/Kathmandu' })}</td>
-                  <td className="sm:hidden text-center">{format(new Date(expense.timestamp), 'PPP')}</td>
-                  <td className="text-center">{expense.quantitySold || '-'}</td>
-                  <td className="text-center text-red-400">{expense.totalAmount}</td>
-                  <td className="text-center">
-                    <button
-                      onClick={() => handleDeleteExpense(expense._id)}
-                      className="flex items-center justify-center h-full"
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="mx-2" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <table className="table w-full">
-            <thead className='bg-black text-white'>
-              <tr>
-                <th>Detail</th>
-                <th>Date</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction, index) => (
-                <tr key={transaction._id} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-                  <td>{transaction.product && transaction.product.name}</td>
-                  <td className="hidden sm:table-cell text-sm text-center">{format(new Date(transaction.timestamp), 'MM/dd', { timeZone: 'Asia/Kathmandu' })}</td>
-                  <td className="sm:hidden text-center">{format(new Date(transaction.timestamp), 'PPP')}</td>
-                  <td className="text-center">{transaction.quantitySold}</td>
-                  <td className="text-center text-green-500">{transaction.totalAmount}</td>
-                  <td className="text-center">
-                    <button
-                      onClick={() => handleDeleteTransaction(transaction._id)}
-                      className="flex items-center justify-center h-full"
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="mx-2" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Expenses Table: Only rendered if filter is set to ALL or EXPENSES */}
+          {currentFilter === FILTER_OPTIONS.ALL || currentFilter === FILTER_OPTIONS.EXPENSES ? (
+            <div>
+              <table className="table w-full mb-4">
+                <thead className='bg-black text-white'>
+                  <tr>
+                    <th>Detail</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.map((expense, index) => (
+                    <tr key={expense._id} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+                      <td>{expense.product && expense.product.name}</td>
+                      <td className="hidden sm:table-cell text-sm text-center">{format(new Date(expense.timestamp), 'MM/dd', { timeZone: 'Asia/Kathmandu' })}</td>
+                      <td className="sm:hidden text-center">{format(new Date(expense.timestamp), 'PPP')}</td>
+                      <td className="text-center">{expense.quantitySold || '-'}</td>
+                      <td className="text-center text-red-400">{expense.totalAmount}</td>
+                      <td className="text-center">
+                        <button
+                          onClick={() => handleDeleteExpense(expense._id)}
+                          className="flex items-center justify-center h-full"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mx-2" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+          {/* Transactions Table: Only rendered if filter is set to ALL or TRANSACTIONS */}
+          {currentFilter === FILTER_OPTIONS.ALL || currentFilter === FILTER_OPTIONS.TRANSACTIONS ? (
+            <div>
+              <table className="table w-full">
+                <thead className='bg-black text-white'>
+                  <tr>
+                    <th>Detail</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((transaction, index) => (
+                    <tr key={transaction._id} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+                      <td>{transaction.product && transaction.product.name}</td>
+                      <td className="hidden sm:table-cell text-sm text-center">{format(new Date(transaction.timestamp), 'MM/dd', { timeZone: 'Asia/Kathmandu' })}</td>
+                      <td className="sm:hidden text-center">{format(new Date(transaction.timestamp), 'PPP')}</td>
+                      <td className="text-center">{transaction.quantitySold}</td>
+                      <td className="text-center text-green-500">{transaction.totalAmount}</td>
+                      <td className="text-center">
+                        <button
+                          onClick={() => handleDeleteTransaction(transaction._id)}
+                          className="flex items-center justify-center h-full"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mx-2" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
 
           {/* Total amounts display */}
           {(startDate && endDate) || (startDate || endDate) ? (
@@ -727,8 +757,9 @@ const Transactions = () => {
             </div>
           )}
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
