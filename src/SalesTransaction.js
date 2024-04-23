@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { baseUrl } from './features/constant';
+import BillModal from './BillModal';
 
 const SalesTransaction = () => {
 
@@ -10,7 +11,7 @@ const SalesTransaction = () => {
   const [customProductPrice, setCustomProductPrice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
-
+  const [showBillModal, setShowBillModal] = useState(false);
   // Function to fetch the list of products from the backend
   const fetchProducts = async () => {
     try {
@@ -18,6 +19,7 @@ const SalesTransaction = () => {
       const response = await fetch(`${baseUrl}/api/products`);
       if (response.ok) {
         const products = await response.json();
+        console.log(products.map(product => typeof product.price));
         setProducts(products);
       } else {
         toast.error('Failed to fetch products.');
@@ -36,11 +38,52 @@ const SalesTransaction = () => {
     fetchProducts();
   }, []);
 
+  const handlePreviewBill = () => {
+    setShowBillModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowBillModal(false);
+  };
+
+  const handlePrintBill = () => {
+    const printableContent = document.querySelector('.printable-area').innerHTML;
+    const printWindow = window.open('', 'Print-Window', 'height=600,width=800');
+    printWindow.document.open();
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print Bill</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                h1, h2, h3, p { margin-bottom: 10px; }
+                /* Additional styling as needed */
+            </style>
+        </head>
+        <body onload="window.print(); window.close();">${printableContent}</body>
+        </html>
+    `);
+    printWindow.document.close();
+  };
+
+
+
+
+  const handleConfirmAndSave = async () => {
+    setShowBillModal(false);
+    try {
+      handleCompleteTransaction();
+
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Error completing transactions.');
+    }
+  };
   const calculateTotalAmount = (item) => {
     const quantity = item.name === customProductName ? quantitySold[customProductName] || 0 : quantitySold[item.name] || 0;
 
     if (quantity) {
-      return item.price * quantity;
+      return parseFloat(item.price) * quantity;
     }
 
     return 0;
@@ -152,6 +195,14 @@ const SalesTransaction = () => {
       setCustomProductPrice('');
     }
   };
+  // const printBill = () => {
+  //   const billContent = document.querySelector('.bill-preview').innerHTML;
+  //   const newWin = window.open('', 'Print-Window');
+  //   newWin.document.open();
+  //   newWin.document.write(`<html><body onload="window.print()">${billContent}</body></html>`);
+  //   newWin.document.close();
+  //   setTimeout(() => newWin.close(), 10);
+  // };
 
   return (
     <div>
@@ -236,7 +287,7 @@ const SalesTransaction = () => {
           </div>
 
           <div className="px-5 flex justify-center items-center mt-4">
-            <button className={'bg-teal-300 mb-5 rounded-md p-2'} onClick={isLoading ? null : handleCompleteTransaction}
+            <button className={'bg-teal-300 mb-5 rounded-md p-2 mr-2'} onClick={isLoading ? null : handleCompleteTransaction}
               disabled={isLoading}>
               {isLoading ? (
                 <div className="h-7 w-7 border-2 border-t-blue-gray-900 rounded-full animate-spin mx-auto"></div>
@@ -244,6 +295,23 @@ const SalesTransaction = () => {
                 'Add Income'
               )}
             </button>
+            <button className={'bg-teal-300 mb-5 rounded-md p-2'} onClick={isLoading ? null : handlePreviewBill}
+              disabled={isLoading}>
+              {isLoading ? (
+                <div className="h-7 w-7 border-2 border-t-blue-gray-900 rounded-full animate-spin mx-auto"></div>
+              ) : (
+                'Preview Bill'
+              )}
+            </button>
+            {showBillModal && (
+              <BillModal
+                selectedProducts={selectedProducts}
+                customProduct={{ name: customProductName, price: customProductPrice, quantity: quantitySold[customProductName] || 0 }}
+                onClose={handleCloseModal}
+                onConfirm={handleConfirmAndSave}
+                onPrint={handlePrintBill}
+              />
+            )}
 
           </div>
         </div>
@@ -251,5 +319,8 @@ const SalesTransaction = () => {
     </div>
   );
 };
+
+
+
 
 export default SalesTransaction;
