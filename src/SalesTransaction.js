@@ -41,30 +41,22 @@ const SalesTransaction = () => {
     setShowBillModal(true);
   };
 
+
   const handleCloseModal = () => {
     setShowBillModal(false);
   };
 
+
+
   const handlePrintBill = () => {
     const printableContent = document.querySelector('.printable-area').innerHTML;
-    const printWindow = window.open('', 'Print-Window', 'height=600,width=800');
-    printWindow.document.open();
-    printWindow.document.write(`
-        <html>
-        <head>
-            <title>Print Bill</title>
-            <style>
-                body { font-family: Arial, sans-serif; }
-                h1, h2, h3, p { margin-bottom: 10px; }
-                /* Additional styling as needed */
-            </style>
-        </head>
-        <body onload="window.print(); window.close();">${printableContent}</body>
-        </html>
-    `);
-    printWindow.document.close();
+    const printWindow = window.open('', '_blank', 'width=600,height=600');
+    printWindow.document.write(`<html><head><title>Print Bill</title><style>
+      body { font-family: Arial, sans-serif; }
+      .content { width: 100%; }
+      </style></head><body><div class='content'>${printableContent}</div></body></html>`);
+    printWindow.print();
   };
-
 
 
 
@@ -306,6 +298,7 @@ const SalesTransaction = () => {
               <BillModal
                 selectedProducts={selectedProducts}
                 customProduct={{ name: customProductName, price: customProductPrice, quantity: quantitySold[customProductName] || 0 }}
+                isOpen={showBillModal}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmAndSave}
                 onPrint={handlePrintBill}
@@ -323,3 +316,48 @@ const SalesTransaction = () => {
 
 
 export default SalesTransaction;
+
+// import React, { useState } from 'react';
+// import BillModal from './BillModal';  // Make sure the path to BillModal is correct
+
+// const SalesTransactions = () => {
+//   const [modalOpen, setModalOpen] = useState(false); // Start with modal closed
+
+//   // Example product data
+//   const selectedProducts = [
+//     { name: "Product A", price: "30.00", quantity: 3 },
+//     { name: "Product B", price: "45.00", quantity: 1 }
+//   ];
+
+//   // Example custom product
+//   const customProduct = {
+//     name: "Custom Service",
+//     price: "75.00",
+//     quantity: 2
+//   };
+
+//   // Handlers for modal actions
+//   const handlePrint = () => {
+//     window.print();
+//   };
+//   const handleConfirm = () => {
+//     console.log("Confirming transaction...");
+//     setModalOpen(false);  // Close modal after confirming
+//   };
+
+//   return (
+//     <div>
+//       <button onClick={() => setModalOpen(true)}>View Bill</button>
+//       <BillModal
+//         selectedProducts={selectedProducts}
+//         customProduct={customProduct}
+//         isOpen={modalOpen}
+//         onClose={() => setModalOpen(false)}
+//         onPrint={handlePrint}
+//         onConfirm={handleConfirm}
+//       />
+//     </div>
+//   );
+// };
+
+// export default SalesTransactions;

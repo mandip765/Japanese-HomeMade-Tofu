@@ -1,5 +1,8 @@
-import React from 'react'
+import React from 'react';
+import './BillModal.css'; // Assuming CSS is externalized
+
 const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, onConfirm }) => {
+  if (!isOpen) return null; // Modal does not render when it's not open
 
   const calculateTotalBill = () => {
     let total = 0;
@@ -13,10 +16,10 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
   };
 
   return (
-    <div className='bill-preview'>
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white p-8 rounded shadow-md text-center">
-          <div className='printable-area'>
+    <div className="bill-preview">
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="printable-area">
             <h3>Bill Summary</h3>
             {selectedProducts.map((product) => (
               <div key={product.name}>
@@ -30,15 +33,10 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
             )}
             <h4>Total: Rs.{calculateTotalBill()}</h4>
           </div>
-          <div className='button-area'>
-            <div className="mt-4">
-              <button className="bg-red-900 text-white px-4 py-2 rounded mr-2"
-                onClick={onPrint}>Print Bill</button>
-              <button className="bg-teal-300 px-4 py-2 rounded"
-                onClick={onConfirm}>Confirm and Save</button>
-              <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded ml-2"
-                onClick={onClose}>Close</button>
-            </div>
+          <div className="button-area">
+            <button className="print-button" onClick={onPrint}>Print Bill</button>
+            <button className="confirm-button" onClick={onConfirm}>Confirm and Save</button>
+            <button className="close-button" onClick={onClose}>Close</button>
           </div>
         </div>
       </div>
@@ -46,5 +44,4 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
   );
 };
 
-
-export default BillModal
+export default BillModal;
