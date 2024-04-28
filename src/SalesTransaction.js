@@ -19,7 +19,6 @@ const SalesTransaction = () => {
       const response = await fetch(`${baseUrl}/api/products`);
       if (response.ok) {
         const products = await response.json();
-        console.log(products.map(product => typeof product.price));
         setProducts(products);
       } else {
         toast.error('Failed to fetch products.');
