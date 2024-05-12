@@ -12,7 +12,7 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
     if (customProduct && customProduct.price) {
       total += parseFloat(customProduct.price) * customProduct.quantity;
     }
-    return total.toFixed(2);
+    return total.toFixed();
   };
 
   return (
@@ -23,12 +23,12 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
             <h3>Bill Summary</h3>
             {selectedProducts.map((product) => (
               <div key={product.name}>
-                {product.name} - Rs.{parseFloat(product.price).toFixed(2)} x {product.quantity} = Rs.{(parseFloat(product.price) * product.quantity).toFixed(2)}
+                {product.name} - Rs.{parseFloat(product.price).toFixed()} x {product.quantity} = Rs.{(parseFloat(product.price) * product.quantity).toFixed()}
               </div>
             ))}
             {customProduct && customProduct.name && (
               <div>
-                {customProduct.name} - Rs.{parseFloat(customProduct.price).toFixed(2)} x {customProduct.quantity} = Rs.{(parseFloat(customProduct.price) * customProduct.quantity).toFixed(2)}
+                {customProduct.name} - Rs.{parseFloat(customProduct.price).toFixed()} x {customProduct.quantity} = Rs.{(parseFloat(customProduct.price) * customProduct.quantity).toFixed(2)}
               </div>
             )}
             <h4>Total: Rs.{calculateTotalBill()}</h4>
