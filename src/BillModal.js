@@ -1,17 +1,21 @@
 import React from 'react';
 import './BillModal.css'; // Assuming CSS is externalized
 
-const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, onConfirm }) => {
+const BillModal = ({ selectedProducts, customProducts, isOpen, onClose, onPrint, onConfirm }) => {
   if (!isOpen) return null; // Modal does not render when it's not open
+  console.log("Custom Product in BillModal:", customProducts); // Log customProduct data
 
   const calculateTotalBill = () => {
     let total = 0;
     selectedProducts.forEach(product => {
       total += parseFloat(product.price) * product.quantity;
     });
-    if (customProduct && customProduct.price) {
-      total += parseFloat(customProduct.price) * customProduct.quantity;
+    if (customProducts) {
+      customProducts.forEach(product => {
+        total += parseFloat(product.price) * (product.quantity || 0);
+      });
     }
+
     return total.toFixed();
   };
 
@@ -26,11 +30,11 @@ const BillModal = ({ selectedProducts, customProduct, isOpen, onClose, onPrint, 
                 {product.name} - Rs.{parseFloat(product.price).toFixed()} x {product.quantity} = Rs.{(parseFloat(product.price) * product.quantity).toFixed()}
               </div>
             ))}
-            {customProduct && customProduct.name && (
-              <div>
-                {customProduct.name} - Rs.{parseFloat(customProduct.price).toFixed()} x {customProduct.quantity} = Rs.{(parseFloat(customProduct.price) * customProduct.quantity).toFixed(2)}
+            {customProducts && customProducts.map(product => (
+              <div key={product.name}>
+                {product.name} - Rs.{parseFloat(product.price).toFixed()} x {product.quantity || 0} = Rs.{(parseFloat(product.price) * (product.quantity || 0)).toFixed()}
               </div>
-            )}
+            ))}
             <h4>Total: Rs.{calculateTotalBill()}</h4>
           </div>
           <div className="button-area">
