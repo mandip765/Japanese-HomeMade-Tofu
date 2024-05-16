@@ -477,7 +477,7 @@ const SalesTransaction = () => {
             <h1 ><strong>Item List</strong></h1>
           </div>
 
-          <div className="grid grid-cols-4 md:grid-cols-2 p-5 gap-2">
+          <div className="grid grid-cols-4  md:grid-cols-2 sm:grid-cols-1 p-5 gap-2">
             {products.map((item) => (
               <div
                 className="bg-blue-100 p-4 border rounded-md"
@@ -505,6 +505,8 @@ const SalesTransaction = () => {
               </div>
 
             ))}
+          </div>
+          <div className='grid grid-cols-4  md:grid-cols-1 p-5 pt-0 gap-2'>
             {customProducts.map((customProduct, index) => (
               <CustomProductInput
                 key={index}
