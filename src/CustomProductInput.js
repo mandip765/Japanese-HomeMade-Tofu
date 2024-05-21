@@ -6,11 +6,15 @@ const CustomProductInput = ({ customProduct, onChange, onRemove }) => {
   };
 
   const handlePriceChange = (e) => {
-    onChange({ ...customProduct, price: e.target.value });
+    const value = e.target.value;
+    const price = value === '' ? 0 : parseFloat(value);
+    onChange({ ...customProduct, price: isNaN(price) ? 0 : price });
   };
 
   const handleQuantityChange = (e) => {
-    onChange({ ...customProduct, quantity: e.target.value });
+    const value = e.target.value;
+    const quantity = value === '' ? 0 : parseInt(value, 10);
+    onChange({ ...customProduct, quantity: isNaN(quantity) ? 0 : quantity });
   };
 
   return (

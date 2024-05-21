@@ -273,19 +273,13 @@ import { baseUrl } from './features/constant';
 import BillModal from './BillModal';
 import CustomProductInput from './CustomProductInput';
 
-
 const SalesTransaction = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [quantitySold, setQuantitySold] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [showBillModal, setShowBillModal] = useState(false);
-  const [customProducts, setCustomProducts] = useState([{ name: '', price: '', quantity: '' }]);
-  // const [customProduct, setCustomProduct] = useState('');
-  // useEffect(() => {
-  //   console.log("Custom Product in SalesTransaction:", customProducts); // Log customProduct data
-  // }, [customProducts]);
-
+  const [customProducts, setCustomProducts] = useState([{ name: '', price: 0, quantity: 0 }]);
 
   const fetchProducts = async () => {
     try {
@@ -347,20 +341,21 @@ const SalesTransaction = () => {
 
     // Calculate total amount for custom products
     customProducts.forEach((product) => {
-      total += parseFloat(product.price) * (product.quantity || 0);
-
+      const price = parseFloat(product.price) || 0;
+      const quantity = parseInt(product.quantity, 10) || 0;
+      total += price * quantity;
     });
 
     return total;
   };
 
-
   const handleQuantityChange = (e, item) => {
-    const quantity = parseInt(e.target.value, 10);
+    const value = e.target.value;
+    const quantity = value === '' ? 0 : parseInt(value, 10);
 
     setQuantitySold((prevQuantitySold) => ({
       ...prevQuantitySold,
-      [item.name]: quantity,
+      [item.name]: isNaN(quantity) ? 0 : quantity,
     }));
 
     setSelectedProducts((prevSelectedProducts) => {
@@ -382,7 +377,19 @@ const SalesTransaction = () => {
       const successMessages = [];
       const errorMessages = [];
 
-      const transactionsPromises = selectedProducts.map(async (selectedProduct) => {
+      const filteredSelectedProducts = selectedProducts.filter(
+        (product) => quantitySold[product.name] > 0
+      );
+      const filteredCustomProducts = customProducts.filter(
+        (product) => product.quantity > 0 && product.name && product.price
+      );
+
+      if (filteredSelectedProducts.length === 0 && filteredCustomProducts.length === 0) {
+        toast.error('Please fill out all required fields with valid values.');
+        return;
+      }
+
+      const transactionsPromises = filteredSelectedProducts.map(async (selectedProduct) => {
         const response = await fetch(`${baseUrl}/api/sales`, {
           method: 'POST',
           headers: {
@@ -395,7 +402,7 @@ const SalesTransaction = () => {
               quantity: quantitySold[selectedProduct.name] || 1,
             },
             quantitySold: quantitySold[selectedProduct.name],
-            totalAmount: calculateTotalAmount(selectedProduct),
+            totalAmount: selectedProduct.price * (quantitySold[selectedProduct.name]),
             timestamp: new Date().toISOString(),
           }),
         });
@@ -407,9 +414,9 @@ const SalesTransaction = () => {
         }
       });
 
-      // Add custom products to transactions
-      await Promise.all(
-        customProducts.map(async (customProduct) => {
+      await Promise.all([
+        ...transactionsPromises,
+        ...filteredCustomProducts.map(async (customProduct) => {
           const response = await fetch(`${baseUrl}/api/sales`, {
             method: 'POST',
             headers: {
@@ -418,11 +425,11 @@ const SalesTransaction = () => {
             body: JSON.stringify({
               product: {
                 name: customProduct.name,
-                price: customProduct.price,
-                quantity: customProduct.quantity || 1,
+                price: parseFloat(customProduct.price) || 0,
+                quantity: parseInt(customProduct.quantity, 10) || 0,
               },
-              quantitySold: customProduct.quantity,
-              totalAmount: parseFloat(customProduct.price) * (customProduct.quantity || 0),
+              quantitySold: parseInt(customProduct.quantity, 10) || 0,
+              totalAmount: (parseFloat(customProduct.price) || 0) * (parseInt(customProduct.quantity, 10) || 0),
               timestamp: new Date().toISOString(),
             }),
           });
@@ -432,11 +439,8 @@ const SalesTransaction = () => {
           } else {
             errorMessages.push(`Failed to add custom product "${customProduct.name}" to the transaction.`);
           }
-        })
-      );
-
-
-      await Promise.all(transactionsPromises);
+        }),
+      ]);
 
       successMessages.forEach((message) => {
         toast.success(message);
@@ -452,10 +456,9 @@ const SalesTransaction = () => {
       setIsLoading(false);
       setSelectedProducts([]);
       setQuantitySold({});
-      setCustomProducts([{ name: '', price: '', quantity: '' }]); // Reset custom products
+      setCustomProducts([{ name: '', price: '0', quantity: '0' }]); // Reset custom products
     }
   };
-
 
   const handleAddCustomProductForm = () => {
     setCustomProducts((prevCustomProducts) => [...prevCustomProducts, { name: '', price: '', quantity: '' }]);
@@ -473,11 +476,11 @@ const SalesTransaction = () => {
         </div>
       ) : (
         <div>
-          <div className=' m-5 mb-0 text-3xl flex justify-between'>
-            <h1 ><strong>Item List</strong></h1>
+          <div className='m-5 mb-0 text-3xl flex justify-between'>
+            <h1><strong>Item List</strong></h1>
           </div>
 
-          <div className="grid grid-cols-4  md:grid-cols-2 sm:grid-cols-1 p-5 gap-2">
+          <div className="grid grid-cols-4 md:grid-cols-2 sm:grid-cols-1 p-5 gap-2">
             {products.map((item) => (
               <div
                 className="bg-blue-100 p-4 border rounded-md"
@@ -492,21 +495,17 @@ const SalesTransaction = () => {
                 <h2 className="text-xl font-bold"> {item.name}</h2>
                 <p>Price: {item.price}</p>
 
-                <label className="block mt-2">
-                  Quantity:
-                  <input
-                    className="w-full rounded-md p-2 border"
-                    type="number"
-                    min="0"
-                    value={quantitySold[item.name] || ''}
-                    onChange={(e) => handleQuantityChange(e, item)}
-                  />
-                </label>
+                <input
+                  type="number"
+                  className="mt-2 p-2 border rounded-md"
+                  placeholder="Quantity"
+                  value={quantitySold[item.name] || ''}
+                  onChange={(e) => handleQuantityChange(e, item)}
+                />
               </div>
-
             ))}
           </div>
-          <div className='grid grid-cols-4  md:grid-cols-1 p-5 pt-0 gap-2'>
+          <div className='grid grid-cols-4 md:grid-cols-1 p-5 pt-0 gap-2'>
             {customProducts.map((customProduct, index) => (
               <CustomProductInput
                 key={index}
@@ -523,7 +522,6 @@ const SalesTransaction = () => {
 
           <div className="flex justify-center mb-4">
             <button className="flex items-center bg-teal-300 rounded-md p-2" onClick={handleAddCustomProductForm}>
-
               <span className="ml-2">Add Custom Product</span>
             </button>
           </div>
@@ -545,14 +543,16 @@ const SalesTransaction = () => {
                 'Preview Bill'
               )}
             </button>
+
             {showBillModal && (
               <BillModal
-                selectedProducts={selectedProducts}
-                customProducts={customProducts}
+                selectedProducts={selectedProducts.filter((product) => quantitySold[product.name] > 0)}
+                customProducts={customProducts.filter((product) => product.quantity > 0 && product.name && product.price)}
                 isOpen={showBillModal}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmAndSave}
                 onPrint={handlePrintBill}
+                totalAmount={calculateTotalAmount()}
               />
             )}
           </div>
