@@ -494,10 +494,9 @@ const SalesTransaction = () => {
                 />
                 <h2 className="text-xl font-bold"> {item.name}</h2>
                 <p>Price: {item.price}</p>
-
                 <input
                   type="number"
-                  className="mt-2 p-2 border rounded-md"
+                  className=" w-full mt-2 p-2 border rounded-md"
                   placeholder="Quantity"
                   value={quantitySold[item.name] || ''}
                   onChange={(e) => handleQuantityChange(e, item)}
