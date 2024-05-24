@@ -331,8 +331,9 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
-import { format, addDays, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, addDays, startOfMonth, endOfMonth } from 'date-fns';
 import { baseUrl } from './features/constant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -342,7 +343,6 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 
 const backendURL = baseUrl;
-
 
 // Define filter options
 const FILTER_OPTIONS = {
@@ -515,9 +515,9 @@ const Transactions = () => {
 
       if (response.ok) {
         setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== confirmationItemId));
-        toast.success('Transaction deleted successfully')
+        toast.success('Transaction deleted successfully');
       } else {
-        toast.error('Failed to delete transaction')
+        toast.error('Failed to delete transaction');
         console.error('Failed to delete transaction. Response:', response);
       }
     } catch (error) {
@@ -525,8 +525,8 @@ const Transactions = () => {
     } finally {
       hideConfirmationModal();
     }
-
   };
+
   const handleDeleteExpensesConfirmation = async () => {
     if (!confirmationItemId) {
       hideConfirmationModal();
@@ -540,18 +540,18 @@ const Transactions = () => {
 
       if (response.ok) {
         setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense._id !== confirmationItemId));
-        toast.success('Transaction deleted successfully')
+        toast.success('Expense deleted successfully');
       } else {
-        toast.error('Failed to delete transaction')
-        console.error('Failed to delete transaction. Response:', response);
+        toast.error('Failed to delete expense');
+        console.error('Failed to delete expense. Response:', response);
       }
     } catch (error) {
-      console.error('Error deleting transaction:', error);
+      console.error('Error deleting expense:', error);
     } finally {
       hideConfirmationModal();
     }
-
   };
+
   const today = new Date();
   const last7Days = addDays(today, -6);
   const last30Days = addDays(today, -29);
@@ -570,13 +570,13 @@ const Transactions = () => {
     setStartDate(range[0]);
     setEndDate(range[1]);
   };
+
   useEffect(() => {
     fetchTotalTransactions();
     fetchDetailedTransactions();
     fetchTotalExpenses();
     fetchDetailedExpenses();
   }, [startDate, endDate]);
-
 
   return (
     <div className="p-5">
@@ -645,7 +645,6 @@ const Transactions = () => {
         message="Are you sure you want to delete this item?"
       />
 
-
       {loading ? (
         <div>
           <lottie-player
@@ -670,6 +669,8 @@ const Transactions = () => {
                     <th>Date</th>
                     <th>Quantity</th>
                     <th>Amount</th>
+                    <th>VAT</th>
+                    <th>Unit</th> {/* Added Unit column */}
                     <th></th>
                   </tr>
                 </thead>
@@ -681,6 +682,8 @@ const Transactions = () => {
                       <td className="sm:hidden text-center">{format(new Date(expense.timestamp), 'PPP')}</td>
                       <td className="text-center">{expense.quantitySold || '-'}</td>
                       <td className="text-center text-red-400">{expense.totalAmount}</td>
+                      <td className="text-center text-red-400">{expense.product.vat || '-'}</td>
+                      <td className="text-center text-red-400">{expense.product.unit || '-'}</td> {/* Added unit data */}
                       <td className="text-center">
                         <button
                           onClick={() => handleDeleteExpense(expense._id)}
@@ -757,9 +760,8 @@ const Transactions = () => {
             </div>
           )}
         </>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 

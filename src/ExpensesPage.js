@@ -2,23 +2,20 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { baseUrl } from './features/constant';
 
-
 const ExpensesPage = () => {
   const [customProductName, setCustomProductName] = useState('');
   const [customProductPrice, setCustomProductPrice] = useState('');
   const [quantitySold, setQuantitySold] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [UnitOfMeasurement, setUnitOfMeasurement] = useState('unit');
+  const [unitOfMeasurement, setUnitOfMeasurement] = useState('unit');
   const [vat, setVat] = useState(0);
 
-
   const calculateTotalAmount = (item) => {
-    const quantity = item.name === customProductName ? quantitySold[customProductName] || 0 : quantitySold[item.name] || 0;
+    const quantity = quantitySold[item.name] || 1;
     const subtotal = item.price * quantity;
-    const vatAmount = (subtotal * vat) / 100;
+    const vatAmount = (subtotal * (parseFloat(vat) || 0)) / 100;
     return subtotal + vatAmount;
   };
-
 
   const handleCompleteTransaction = async () => {
     try {
@@ -31,6 +28,8 @@ const ExpensesPage = () => {
           name: customProductName,
           price: parseFloat(customProductPrice),
           quantity: quantitySold[customProductName] || 1,
+          unit: unitOfMeasurement,
+          vat: parseFloat(vat) || 0,
           timestamp: new Date(),
         };
 
@@ -43,8 +42,8 @@ const ExpensesPage = () => {
             product: customProduct,
             quantitySold: customProduct.quantity,
             totalAmount: calculateTotalAmount(customProduct),
+            vat: customProduct.vat,
             timestamp: new Date(),
-
           }),
         });
 
@@ -53,14 +52,13 @@ const ExpensesPage = () => {
         } else {
           errorMessages.push('Failed to add custom product to the transaction.');
         }
+      } else {
+        errorMessages.push('Please provide both product name and price.');
       }
-      successMessages.forEach((message) => {
-        toast.success(message);
-      });
 
-      errorMessages.forEach((message) => {
-        toast.error(message);
-      });
+      successMessages.forEach((message) => toast.success(message));
+      errorMessages.forEach((message) => toast.error(message));
+
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error completing transactions.');
@@ -69,31 +67,29 @@ const ExpensesPage = () => {
       setQuantitySold({});
       setCustomProductName('');
       setCustomProductPrice('');
+      setVat(0);
     }
   };
 
-
   return (
     <div>
-      <div className="p-5 gap-2 ">
+      <div className="p-5 gap-2">
         <div>
           <form className="p-5 bg-blue-100 rounded-md">
             <h2 className="text-xl mb-4 font-bold">Add Expenses</h2>
             <div className="mb-4">
               <label className="block mb-1">Product Name:</label>
-
               <input
                 className="w-full rounded-md p-2 border"
                 type="text"
                 value={customProductName}
                 onChange={(e) => setCustomProductName(e.target.value)}
               />
-
             </div>
 
             <div className="mb-4">
               <label className="block mb-1">Product Price:</label>
-              <div className='  grid grid-flow-col'>
+              <div className="grid grid-flow-col">
                 <input
                   className="w-full rounded-md p-2 border"
                   type="number"
@@ -104,6 +100,7 @@ const ExpensesPage = () => {
                 />
                 <select
                   className="ml-2 p-2 border rounded-md"
+                  value={unitOfMeasurement}
                   onChange={(e) => setUnitOfMeasurement(e.target.value)}
                 >
                   <option value="unit">per unit</option>
@@ -112,6 +109,7 @@ const ExpensesPage = () => {
                 </select>
               </div>
             </div>
+
             <div className="mb-4">
               <label className="block mb-1">VAT Rate (%):</label>
               <input
@@ -120,7 +118,7 @@ const ExpensesPage = () => {
                 min="0"
                 step="0.01"
                 value={vat}
-                onChange={(e) => setVat(parseFloat(e.target.value))}
+                onChange={(e) => setVat(e.target.value)}
               />
             </div>
 
@@ -141,7 +139,7 @@ const ExpensesPage = () => {
             </div>
           </form>
         </div>
-      </div >
+      </div>
 
       <div className="px-5 flex justify-center items-center mt-4">
         <button
@@ -152,7 +150,7 @@ const ExpensesPage = () => {
           {isLoading ? 'Adding Expense...' : 'Add Expense'}
         </button>
       </div>
-    </div >
+    </div>
   );
 };
 
